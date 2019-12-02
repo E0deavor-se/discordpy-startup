@@ -8,84 +8,66 @@ import traceback
 bot = commands.Bot(command_prefix='.')
 token = os.environ['DISCORD_BOT_TOKEN']
     
-@bot.command()
-async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
-    cnt, settime = int(cnt), float(settime)
-    reaction_member = ["♦参加者一覧♦"]
-    reaction_emoji = "✔参加/❌参加取消/✋募集停止"
-    test = discord.Embed(title=f"現在の {about} 募集状況",colour=0x1e90ff)
-    test.add_field(name=f"あと{cnt}人 募集中\n", value=None, inline=True)
-    msg = await ctx.send(embed=test)
-    msg2 = await ctx.send(reaction_emoji)
-    
-    #投票の欄
-    await msg.add_reaction('✔')
-    await msg.add_reaction('❌')
-    await msg.add_reaction('✋')
+bot = discord.Client()
 
-    def check(reaction, user):
-        emoji = str(reaction.emoji)
-        if user.bot == True:    # botは無視
-            pass
-        else:
-            return emoji == '✔' or emoji == '❌' or emoji == '✋'
+@client.event
+async def on_message(message):
+    """メンバー募集 (.rect@数字)"""
+    if message.content.startswith(".rect"):
+        mcount = int(message.content[6:len(message.content)])
+        text= "あと{}人 募集中\n"
+        revmsg = text.format(mcount)
+        #friend_list 押した人のList
+        frelist = []
+        msg = await bot.send_message(message.channel, revmsg)
 
-    while len(reaction_member)-1 <= cnt:
-        try:
-            reaction, user = await client.wait_for('reaction_add', timeout=settime, check=check)
-        except asyncio.TimeoutError:
-            await msg.delete()#メッセージの削除
-            await msg2.delete()#メッセージの削除
-            await ctx.send('残念、人が足りなかったようだ...')
-            break
-        else:
-            print(str(reaction.emoji))
-            if str(reaction.emoji) == '✔':
-                reaction_member.append(user.name)
-                cnt -= 1
-                test = discord.Embed(title=f"現在の　{about} 募集状況",colour=0x1e90ff)
-                test.add_field(name=f"あと__{cnt}__人 募集中\n", value='\n'.join(reaction_member), inline=True)
-                await msg.edit(embed=test)
-
-                if cnt == 0:
-                    test = discord.Embed(title=f"現在 {about} 募集状況",colour=0x1e90ff)
-                    test.add_field(name=f"あと__{cnt}__人 募集中\n", value='\n@'.join(reaction_member), inline=True)
-                    await msg.edit(embed=test)
-                    finish = discord.Embed(title=f"{about} 募集終了（満員御礼）",colour=0xFF0000)
-                    finish.add_field(name="仲間が集まったようだ。",value='\n@'.join(reaction_member), inline=True)
-                    msg3 = await ctx.send(embed=finish)                                 
-                    await msg.delete()#メッセージの削除
-                    await msg2.delete()#メッセージの削除
-                    #await asyncio.sleep(10)
-                    #await msg3.delete()#メッセージの削除
-
-            elif str(reaction.emoji) == '❌':
-                if user.name in reaction_member:
-                    reaction_member.remove(user.name)
-                    cnt += 1
-                    test = discord.Embed(title=f"現在の　{about} 募集状況",colour=0x1e90ff)
-                    test.add_field(name=f"あと__{cnt}__人 募集中\n@", value='\n'.join(reaction_member), inline=True)
-                    await msg.edit(embed=test)
-                else:
-                    pass
-        # リアクション消す。メッセージ管理権限がないとForbidden:エラーが出ます。
-        await msg.remove_reaction(str(reaction.emoji), user)
-        
-@bot.command()
-async def アンケート(ctx, about = "question", *args):
-    emojis = ["1⃣","2⃣","3⃣","4⃣"]
-
-    cnt = len(args)
-    message = discord.Embed(title=":speech_balloon: "+about,colour=0x1e90ff)
-    if cnt <= len(emojis):
-        for a in range(cnt):
-            message.add_field(name=f'{emojis[a]}{args[a]}', value="** **", inline=False)
-        msg = await ctx.send(embed=message)
         #投票の欄
-        for i in range(cnt):
-            await msg.add_reaction(emojis[i])
-    else:
-        await ctx.send("悪い...項目は4つまでなんだ...")
+        await bot.add_reaction(msg, '\u21a9')
+        await bot.add_reaction(msg, '⏫')
+        await bot.pin_message(msg)
 
+        #リアクションをチェックする
+        while len(frelist) < int(message.content[6:len(message.content)]):
+            target_reaction = await bot.wait_for_reaction(message=msg)
+            #発言したユーザが同一でない場合 真
+            if target_reaction.user != msg.author:
+                #==============================================================
+                #押された絵文字が既存のものの場合 >> 左　del
+                if target_reaction.reaction.emoji == '\u21a9':
+                    #==========================================================
+                    #◀のリアクションに追加があったら反応 frelistにuser.nameがあった場合　真
+                    if target_reaction.user.name in frelist:
+                        frelist.remove(target_reaction.user.name)
+                        mcount += 1
+                        #リストから名前削除
+                        await bot.edit_message(msg, text.format(mcount) +
+                                                        '\n'.join(frelist))
+                            #メッセージを書き換え
+
+                    else:
+                        pass
+                #==============================================================
+                #押された絵文字が既存のものの場合　>> 右　add
+                elif target_reaction.reaction.emoji == '⏫':
+                    if target_reaction.user.name in frelist:
+                        pass
+
+                    else:
+                        frelist.append(target_reaction.user.name)
+                        #リストに名前追加
+                        mcount = mcount - 1
+                        await bot.edit_message(msg, text.format(mcount) +
+                                                        '\n'.join(frelist))
+
+
+                elif target_reaction.reaction.emoji == '✖':
+                        await bot.edit_message(msg, '募集終了\n'+ '\n'.join(frelist))
+                        await bot.unpin_message(msg)
+                        break
+                await client.remove_reaction(msg, target_reaction.reaction.emoji, target_reaction.user)
+                #ユーザーがつけたリアクションを消す※権限によってはエラー
+                #==============================================================
+        else:
+            await bot.edit_message(msg, '募集終了\n'+ '\n'.join(frelist))
 
 bot.run(token)
