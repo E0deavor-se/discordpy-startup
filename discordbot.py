@@ -10,7 +10,7 @@ token = os.environ['DISCORD_BOT_TOKEN']
     
 bot = discord.Client()
 
-@client.event
+@bot.event
 async def on_message(message):
     """メンバー募集 (.rect@数字)"""
     if message.content.startswith(".rect"):
@@ -64,7 +64,7 @@ async def on_message(message):
                         await bot.edit_message(msg, '募集終了\n'+ '\n'.join(frelist))
                         await bot.unpin_message(msg)
                         break
-                await client.remove_reaction(msg, target_reaction.reaction.emoji, target_reaction.user)
+                await bot.remove_reaction(msg, target_reaction.reaction.emoji, target_reaction.user)
                 #ユーザーがつけたリアクションを消す※権限によってはエラー
                 #==============================================================
         else:
