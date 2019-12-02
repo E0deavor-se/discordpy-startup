@@ -24,7 +24,7 @@ async def ping(ctx):
 async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
     cnt, settime = int(cnt), float(settime)
     reaction_member = ["♦参加者一覧♦"]
-    reaction_emoji = "✋参加/☠参加取消/⛔募集停止"
+    reaction_emoji = "✋参加/✖参加取消/⛔募集停止"
     test = discord.Embed(title=f"現在の {about} 募集状況",colour=0x1e90ff)
     test.add_field(name=f"あと{cnt}人 募集中\n", value=None, inline=True)
     msg = await ctx.send(embed=test)
