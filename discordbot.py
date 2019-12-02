@@ -67,4 +67,4 @@ async def on_message(message):
             await client.edit_message(msg, '募集終了\n'+ '\n'.join(frelist))
 
 
-bot.run(token)
+client.run(token)
