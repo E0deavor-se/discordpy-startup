@@ -21,14 +21,14 @@ async def on_command_error(ctx, error):
 async def ping(ctx):
     await ctx.send('pong')
     
-@client.event
+@bot.event
 async def on_ready():
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
     print('------')
 
-@client.command()
+@bot.command()
 async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
     cnt, settime = int(cnt), float(settime)
     reaction_member = ["♦参加者一覧♦"]
@@ -91,7 +91,7 @@ async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
         # リアクション消す。メッセージ管理権限がないとForbidden:エラーが出ます。
         await msg.remove_reaction(str(reaction.emoji), user)
         
-@client.command()
+@bot.command()
 async def アンケート(ctx, about = "question", *args):
     emojis = ["1⃣","2⃣","3⃣","4⃣"]
 
