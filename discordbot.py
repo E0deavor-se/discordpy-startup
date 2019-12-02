@@ -18,8 +18,8 @@ async def on_message(message):
         msg = await client.send_message(message.channel, revmsg)
 
         #投票の欄
-        await client.add_reaction(msg, '\u21a9')
-        await client.add_reaction(msg, '⏫')
+        await client.add_reaction(msg, '✋')
+        await client.add_reaction(msg, '✋')
         await client.pin_message(msg)
 
         #リアクションをチェックする
@@ -29,7 +29,7 @@ async def on_message(message):
             if target_reaction.user != msg.author:
                 #==============================================================
                 #押された絵文字が既存のものの場合 >> 左　del
-                if target_reaction.reaction.emoji == '\u21a9':
+                if target_reaction.reaction.emoji == '✋':
                     #==========================================================
                     #◀のリアクションに追加があったら反応 frelistにuser.nameがあった場合　真
                     if target_reaction.user.name in frelist:
@@ -44,7 +44,7 @@ async def on_message(message):
                         pass
                 #==============================================================
                 #押された絵文字が既存のものの場合　>> 右　add
-                elif target_reaction.reaction.emoji == '⏫':
+                elif target_reaction.reaction.emoji == '✋':
                     if target_reaction.user.name in frelist:
                         pass
 
@@ -56,7 +56,7 @@ async def on_message(message):
                                                         '\n'.join(frelist))
 
 
-                elif target_reaction.reaction.emoji == '✖':
+                elif target_reaction.reaction.emoji == '✋':
                         await client.edit_message(msg, '募集終了\n'+ '\n'.join(frelist))
                         await client.unpin_message(msg)
                         break
