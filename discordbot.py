@@ -5,7 +5,7 @@ import sys
 import os
 import traceback
 
-bot = commands.Bot(command_prefix='/')
+bot = commands.Bot(command_prefix='.')
 token = os.environ['DISCORD_BOT_TOKEN']
     
 @bot.command()
@@ -88,4 +88,4 @@ async def アンケート(ctx, about = "question", *args):
         await ctx.send("悪い...項目は4つまでなんだ...")
 
 
-bot.run("NjQ5OTk2MDUxNTQwODY5MTIw.XeFFJQ.C0KKcSLMp8ca0fwSBu3KlNiPu34")
+bot.run(token)
