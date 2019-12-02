@@ -7,32 +7,20 @@ import traceback
 
 bot = commands.Bot(command_prefix='/')
 token = os.environ['DISCORD_BOT_TOKEN']
-
-@bot.event
-async def on_command_error(ctx, error):
-    orig_error = getattr(error, "original", error)
-    error_msg = ''.join(traceback.TracebackException.from_exception(orig_error).format())
-    await ctx.send(error_msg)
-
-
-@bot.command()
-async def ping(ctx):
-    await ctx.send('pong')
     
-
 @bot.command()
 async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
     cnt, settime = int(cnt), float(settime)
     reaction_member = ["♦参加者一覧♦"]
-    reaction_emoji = "✋参加/✋参加取消/✋募集停止"
+    reaction_emoji = "✔参加/❌参加取消/✋募集停止"
     test = discord.Embed(title=f"現在の {about} 募集状況",colour=0x1e90ff)
     test.add_field(name=f"あと{cnt}人 募集中\n", value=None, inline=True)
     msg = await ctx.send(embed=test)
     msg2 = await ctx.send(reaction_emoji)
     
     #投票の欄
-    await msg.add_reaction('✋')
-    await msg.add_reaction('✋')
+    await msg.add_reaction('✔')
+    await msg.add_reaction('❌')
     await msg.add_reaction('✋')
 
     def check(reaction, user):
@@ -40,7 +28,7 @@ async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
         if user.bot == True:    # botは無視
             pass
         else:
-            return emoji == '✋' or emoji == '✋' or emoji == '✋'
+            return emoji == '✔' or emoji == '❌' or emoji == '✋'
 
     while len(reaction_member)-1 <= cnt:
         try:
@@ -52,7 +40,7 @@ async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
             break
         else:
             print(str(reaction.emoji))
-            if str(reaction.emoji) == '✋':
+            if str(reaction.emoji) == '✔':
                 reaction_member.append(user.name)
                 cnt -= 1
                 test = discord.Embed(title=f"現在の　{about} 募集状況",colour=0x1e90ff)
@@ -71,7 +59,7 @@ async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
                     #await asyncio.sleep(10)
                     #await msg3.delete()#メッセージの削除
 
-            elif str(reaction.emoji) == '✋':
+            elif str(reaction.emoji) == '❌':
                 if user.name in reaction_member:
                     reaction_member.remove(user.name)
                     cnt += 1
@@ -100,4 +88,4 @@ async def アンケート(ctx, about = "question", *args):
         await ctx.send("悪い...項目は4つまでなんだ...")
 
 
-bot.run(token)
+bot.run("NjQ5OTk2MDUxNTQwODY5MTIw.XeFFJQ.C0KKcSLMp8ca0fwSBu3KlNiPu34")
