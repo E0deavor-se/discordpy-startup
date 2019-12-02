@@ -19,12 +19,6 @@ async def on_command_error(ctx, error):
 async def ping(ctx):
     await ctx.send('pong')
     
-@bot.event
-async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    print('------')
 
 @bot.command()
 async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
@@ -38,7 +32,7 @@ async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
     
     #投票の欄
     await msg.add_reaction('✋')
-    await msg.add_reaction('☠')
+    await msg.add_reaction('✖')
     await msg.add_reaction('⛔')
 
     def check(reaction, user):
@@ -46,7 +40,7 @@ async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
         if user.bot == True:    # botは無視
             pass
         else:
-            return emoji == '✋' or emoji == '☠' or emoji == '⛔'
+            return emoji == '✋' or emoji == '✖' or emoji == '⛔'
 
     while len(reaction_member)-1 <= cnt:
         try:
@@ -77,7 +71,7 @@ async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
                     #await asyncio.sleep(10)
                     #await msg3.delete()#メッセージの削除
 
-            elif str(reaction.emoji) == '☠':
+            elif str(reaction.emoji) == '✖':
                 if user.name in reaction_member:
                     reaction_member.remove(user.name)
                     cnt += 1
