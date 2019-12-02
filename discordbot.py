@@ -4,21 +4,21 @@ import asyncio
 import os
 import traceback
 
-bot = commands.Bot(command_prefix='.')
+client = commands.Bot(command_prefix='.')
 token = os.environ['DISCORD_BOT_TOKEN']
 
-@bot.event
+@client.event
 async def on_command_error(ctx, error):
     orig_error = getattr(error, "original", error)
     error_msg = ''.join(traceback.TracebackException.from_exception(orig_error).format())
     await ctx.send(error_msg)
 
 
-@bot.command()
+@client.command()
 async def ping(ctx):
     await ctx.send('pong')
     
-@bot.command()
+@client.command()
 async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
     cnt, settime = int(cnt), float(settime)
     reaction_member = ["♦参加者一覧♦"]
@@ -42,7 +42,7 @@ async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
 
     while len(reaction_member)-1 <= cnt:
         try:
-            reaction, user = await bot.wait_for('reaction_add', timeout=settime, check=check)
+            reaction, user = await client.wait_for('reaction_add', timeout=settime, check=check)
         except asyncio.TimeoutError:
             await msg.delete()#メッセージの削除
             await msg2.delete()#メッセージの削除
@@ -81,7 +81,7 @@ async def 募集(ctx, about = "募集", cnt = 5, settime = 86400.0):
         # リアクション消す。メッセージ管理権限がないとForbidden:エラーが出ます。
         await msg.remove_reaction(str(reaction.emoji), user)
         
-@bot.command()
+@client.command()
 async def アンケート(ctx, about = "question", *args):
     emojis = ["1⃣","2⃣","3⃣","4⃣"]
 
@@ -97,4 +97,4 @@ async def アンケート(ctx, about = "question", *args):
     else:
         await ctx.send("悪い...項目は4つまでなんだ...")
 
-bot.run(token)
+client.run(token)
